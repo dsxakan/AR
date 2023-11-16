@@ -1,0 +1,67 @@
+#include <iostream>
+#include <unordered_map>
+#include <set>
+
+class ArithmeticCoding {
+private:
+	std::string text;
+	std::unordered_map<char, double> probabilities;
+	double low, high, range;
+
+	std::unordered_map<char, double> calculateProbabilities() {
+		std::set<char> alphabet(text.begin(), text.end());
+		double probabilityPerSymbol = 1.0 / alphabet.size();
+		std::unordered_map<char, double> calculatedProbabilities;
+		for (char symbol : alphabet) {
+			calculatedProbabilities[symbol] = probabilityPerSymbol;
+		}
+		return calculatedProbabilities;
+	}
+
+public:
+	ArithmeticCoding(const std::string &text) {
+		this->text = text;
+		this->probabilities = calculateProbabilities();
+		this->low = 0;
+		this->high = 1;
+		this->range = 1;
+	}
+
+	double encode() {
+		for (char symbol : text) {
+			double probability = probabilities[symbol];
+			auto[lowRange, highRange] = calculateRange(probability);
+			updateRange(lowRange, highRange);
+		}
+		return (low + high) / 2;
+	}
+
+private:
+	std::pair<double, double> calculateRange(double probability) {
+		double lowRange = low + range * probability;
+		double highRange = low + range * probability;
+		return{ lowRange, highRange };
+	}
+
+	void updateRange(double lowRange, double highRange) {
+		low = lowRange;
+		high = highRange;
+		range = highRange - lowRange;
+	}
+};
+
+int main() {
+	// Текст
+	std::string textToEncode;
+	std::cout << "add text: ";
+	std::getline(std::cin, textToEncode);
+
+	//Расчет арифметического кода
+	ArithmeticCoding arithmeticCoder(textToEncode);
+	double encodedResult = arithmeticCoder.encode();
+
+	//Вывод результата
+	std::cout << "Arifmetik kod: " << encodedResult << std::endl;
+
+	return 0;
+}
